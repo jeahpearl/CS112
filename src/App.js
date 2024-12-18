@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import AddDengueData from "./AddDengueData";
 import DengueDataList from "./DengueDataList";
 import CsvUpload from "./CsvUpload";
 import Dashboard from "./components/Dashboard/Dashboard";  // Import the Dashboard component
@@ -10,19 +9,10 @@ import { BiHomeAlt, BiData, BiLineChart } from "react-icons/bi";
 
 function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [showAddDataModal, setShowAddDataModal] = useState(false);
-  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [showCsvModal, setShowCsvModal] = useState(false)
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-  };
-
-  const openAddDataModal = () => {
-    setShowAddDataModal(true);
-  };
-
-  const closeAddDataModal = () => {
-    setShowAddDataModal(false);
   };
 
   const openCsvModal = () => {
@@ -84,13 +74,12 @@ function App() {
           <div>
             <div className="header-section">
               <div className="button-group">
-                <button className="add-data-trigger" onClick={openAddDataModal}>
-                  Add Data
-                </button>
+              
                 <button className="add-data-trigger" onClick={openCsvModal}>
                   Upload CSV
                 </button>
               </div>
+              {/* Updated to display new dataset list */}
               <DengueDataList />
             </div>
           </div>
@@ -99,22 +88,6 @@ function App() {
         {activeTab === "insights" && <Insights />}
       </div>
 
-      {/* Add Data Modal */}
-      {showAddDataModal && (
-        <div className="modal-overlay" onClick={closeAddDataModal}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Add Data</h2>
-              <button className="modal-close" onClick={closeAddDataModal}>
-                &times;
-              </button>
-            </div>
-            <div className="add-data-form">
-              <AddDengueData />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Upload CSV Modal */}
       {showCsvModal && (

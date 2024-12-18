@@ -8,13 +8,13 @@ import { getAnalytics } from "firebase/analytics";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCyMZ79p-fMIefhx5w3ZnLcO8DutqMMaBA",
-  authDomain: "itd112-daligdiglab2.firebaseapp.com",
-  projectId: "itd112-daligdiglab2",
-  storageBucket: "itd112-daligdiglab2.firebasestorage.app",
-  messagingSenderId: "719434569673",
-  appId: "1:719434569673:web:c78b86e0eb04ceb7f8ba18",
-  measurementId: "G-PQGPFMTME8"
+  apiKey: "AIzaSyAlzSIbHty73o-eGxr8KYJ8gzymPjjkSzc",
+  authDomain: "casestudy112-9d913.firebaseapp.com",
+  projectId: "casestudy112-9d913",
+  storageBucket: "casestudy112-9d913.firebasestorage.app",
+  messagingSenderId: "173822378352",
+  appId: "1:173822378352:web:bb2073fca95e73c2188fb5",
+  measurementId: "G-R76KJZQFHN"
 };
 
 

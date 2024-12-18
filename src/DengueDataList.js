@@ -3,25 +3,24 @@ import { collection, getDocs, doc, deleteDoc, updateDoc } from "firebase/firesto
 import { db } from "./firebase";
 import Modal from "react-modal";
 import { TbDeviceTabletSearch } from "react-icons/tb"; // Import the new search icon
+import { BiBook} from "react-icons/bi"; // Import the chosen icon
 
 Modal.setAppElement("#root");
 
 const DengueDataList = () => {
-  const [natData, setNatData] = useState([]);
+
+  const [nutritionData, setNutritionData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({
-    respondents: "",
-    age: "",
-    sex: "",
-    ethnic: "",
-    academic_performance: "",
-    academic_description: "",
-    iq: "",
-    type_of_school: "",
-    socio_economic_status: "",
-    study_habit: "",
-    nat_results: "",
+    country: "",
+    income_classification: "",
+    severe_wasting: "",
+    wasting: "",
+    overweight: "",
+    stunting: "",
+    underweight: "",
+    u5_population: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,10 +34,10 @@ const DengueDataList = () => {
   }, []);
 
   const fetchData = async () => {
-    const natCollection = collection(db, "natData");
-    const natSnapshot = await getDocs(natCollection);
-    const dataList = natSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setNatData(dataList);
+    const nutritionCollection = collection(db, "nutritionData");
+    const snapshot = await getDocs(nutritionCollection);
+    const dataList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    setNutritionData(dataList);
     setFilteredData(dataList);
   };
 
@@ -48,13 +47,13 @@ const DengueDataList = () => {
 
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
-    const filteredData = natData.filter((entry) =>
+    const filteredData = nutritionData.filter((entry) =>
       Object.keys(entry).some((key) =>
         String(entry[key]).toLowerCase().includes(lowercasedFilter)
       )
     );
     setFilteredData(filteredData);
-  }, [searchTerm, natData]);
+  }, [searchTerm, nutritionData]);
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -102,10 +101,10 @@ const DengueDataList = () => {
   };
 
   const handleDelete = async () => {
-    const natDocRef = doc(db, "natData", deleteId);
+    const nutritionDocRef = doc(db, "nutritionData", deleteId);
     try {
-      await deleteDoc(natDocRef);
-      setNatData(natData.filter((data) => data.id !== deleteId));
+      await deleteDoc(nutritionDocRef);
+      setNutritionData(nutritionData.filter((data) => data.id !== deleteId));
       alert("Data deleted successfully!");
     } catch (error) {
       console.error("Error deleting document: ", error);
@@ -134,17 +133,22 @@ const DengueDataList = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const natDocRef = doc(db, "natData", editingId);
+    const nutritionDocRef = doc(db, "nutritionData", editingId);
 
     try {
-      await updateDoc(natDocRef, {
+      await updateDoc(nutritionDocRef, {
         ...editForm,
-        age: Number(editForm.age),
-        nat_results: Number(editForm.nat_results),
+        income_classification: Number(editForm.income_classification),
+        severe_wasting: Number(editForm.severe_wasting),
+        wasting: Number(editForm.wasting),
+        overweight: Number(editForm.overweight),
+        stunting: Number(editForm.stunting),
+        underweight: Number(editForm.underweight),
+        u5_population: Number(editForm.u5_population),
       });
 
-      setNatData(
-        natData.map((data) =>
+      setNutritionData(
+        nutritionData.map((data) =>
           data.id === editingId ? { id: editingId, ...editForm } : data
         )
       );
@@ -174,37 +178,77 @@ const DengueDataList = () => {
         />
       </div>
 
+      {/* Collapsible Legend */}
+      <div style={{ marginTop: "20px" }}>
+        <details
+          style={{
+            backgroundColor: "#004d4d",
+            color: "#fff",
+            padding: "10px",
+            borderRadius: "5px",
+            marginBottom: "20px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add shadow
+          }}
+        >
+          <summary
+            style={{
+              fontWeight: "bold",
+              fontSize: "1.1rem", // Increase font size
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px", // Space between icon and text
+            }}
+          >
+            <span className="icon-hover">
+              <BiBook size={20} />
+            </span>
+            Legend: Column Definitions
+          </summary>
+          <div style={{ marginTop: "10px", lineHeight: "1.5", textAlign: "left" }}>
+            <p><strong>Country:</strong> The name of the country.</p>
+            <p><strong>Income Classification:</strong></p>
+            <ul style={{ marginLeft: "20px", marginBottom: "10px"  }}>
+              <li><strong>0:</strong> Low Income</li>
+              <li><strong>1:</strong> Lower Middle Income</li>
+              <li><strong>2:</strong> Upper Middle Income</li>
+              <li><strong>3:</strong> High Income</li>
+            </ul>
+            <p><strong>Severe Wasting:</strong> Percentage of children severely undernourished.</p>
+            <p><strong>Wasting:</strong> Percentage of children with moderate malnutrition.</p>
+            <p><strong>Overweight:</strong> Percentage of children who are overweight.</p>
+            <p><strong>Stunting:</strong> Percentage of children with growth failure due to malnutrition.</p>
+            <p><strong>Underweight:</strong> Percentage of children underweight for their age.</p>
+            <p><strong>U5 Population:</strong> Population of children under 5 years old (in thousands).</p>
+          </div>
+        </details>
+      </div>
+
       <table>
         <thead>
           <tr>
-            <th>Respondents</th>
-            <th>Age</th>
-            <th>Sex</th>
-            <th>Ethnic</th>
-            <th>Academic Performance</th>
-            <th>Academic Description</th>
-            <th>IQ</th>
-            <th>Type of School</th>
-            <th>Socio-Economic Status</th>
-            <th>Study Habit</th>
-            <th>NAT Results</th>
+            <th>Country</th>
+            <th>Income Classification</th>
+            <th>Severe Wasting</th>
+            <th>Wasting</th>
+            <th>Overweight</th>
+            <th>Stunting</th>
+            <th>Underweight</th>
+            <th>U5 Population</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {currentData.map((data) => (
             <tr key={data.id}>
-              <td>{data.respondents}</td>
-              <td>{data.age}</td>
-              <td>{data.sex}</td>
-              <td>{data.ethnic}</td>
-              <td>{data.academic_performance}</td>
-              <td>{data.academic_description}</td>
-              <td>{data.iq}</td>
-              <td>{data.type_of_school}</td>
-              <td>{data.socio_economic_status}</td>
-              <td>{data.study_habit}</td>
-              <td>{data.nat_results}</td>
+              <td>{data.country}</td>
+              <td>{data.income_classification}</td>
+              <td>{parseFloat(data.severe_wasting).toFixed(2)}</td>
+              <td>{parseFloat(data.wasting).toFixed(2)}</td>
+              <td>{parseFloat(data.overweight).toFixed(2)}</td>
+              <td>{parseFloat(data.stunting).toFixed(2)}</td>
+              <td>{parseFloat(data.underweight).toFixed(2)}</td>
+              <td>{parseFloat(data.u5_population).toFixed(2)}</td>
               <td>
                 <button className="data-list-button edit" onClick={() => handleEdit(data)}>
                   Edit
@@ -228,33 +272,114 @@ const DengueDataList = () => {
         </button>
       </div>
 
+
       {/* Edit Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onRequestClose={closeEditModal}
-        contentLabel="Edit NAT Data"
+        contentLabel="Edit Data"
         className="modal edit-data-modal"
         overlayClassName="modal-overlay"
       >
-        <h2>Edit NAT Data</h2>
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Edit Data</h2>
         <form onSubmit={handleUpdate} className="edit-data-form">
-          {Object.keys(editForm).map((key) => (
-            <input
-              key={key}
-              type={key === "age" || key === "nat_results" ? "number" : "text"}
-              placeholder={key}
-              value={editForm[key]}
-              onChange={(e) => setEditForm({ ...editForm, [key]: e.target.value })}
-              required
-            />
-          ))}
-          <div className="modal-footer">
-            <button type="submit">Update Data</button>
-            <button type="button" onClick={closeEditModal}>
-              Cancel
-            </button>
-          </div>
-        </form>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                COUNTRY
+              </label>
+              <input
+                type="text"
+                value={editForm.country}
+                onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                INCOME CLASSIFICATION
+              </label>
+              <input
+                type="number"
+                value={editForm.income_classification}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, income_classification: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                SEVERE WASTING
+              </label>
+              <input
+                type="number"
+                value={editForm.severe_wasting}
+                onChange={(e) => setEditForm({ ...editForm, severe_wasting: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                WASTING
+              </label>
+              <input
+                type="number"
+                value={editForm.wasting}
+                onChange={(e) => setEditForm({ ...editForm, wasting: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                OVERWEIGHT
+              </label>
+              <input
+                type="number"
+                value={editForm.overweight}
+                onChange={(e) => setEditForm({ ...editForm, overweight: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                STUNTING
+              </label>
+              <input
+                type="number"
+                value={editForm.stunting}
+                onChange={(e) => setEditForm({ ...editForm, stunting: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                UNDERWEIGHT
+              </label>
+              <input
+                type="number"
+                value={editForm.underweight}
+                onChange={(e) => setEditForm({ ...editForm, underweight: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-field">
+              <label style={{ fontWeight: "bold", marginBottom: "5px", display: "block" }}>
+                U5 POPULATION
+              </label>
+              <input
+                type="number"
+                value={editForm.u5_population}
+                onChange={(e) => setEditForm({ ...editForm, u5_population: e.target.value })}
+                required
+              />
+            </div>
+            <div className="modal-footer">
+              <button type="submit">Update Data</button>
+              <button type="button" onClick={closeEditModal}>
+                Cancel
+              </button>
+            </div>
+          </form>
       </Modal>
 
       {/* Delete Confirmation Modal */}

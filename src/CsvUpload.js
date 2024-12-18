@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Papa from "papaparse";
-import { collection, addDoc } from "firebase/firestore";  
-import { db } from "./firebase";  
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "./firebase";
 
 const CsvUpload = () => {
   const [csvData, setCsvData] = useState([]);
@@ -20,7 +20,7 @@ const CsvUpload = () => {
         setCsvData(result.data);
         setError(null);
       },
-      header: true,  // Use the first row as the header
+      header: true,
       skipEmptyLines: true,
     });
   };
@@ -33,24 +33,28 @@ const CsvUpload = () => {
 
     setLoading(true);
     try {
-      const natCollection = collection(db, "natData");
+      const nutritionCollection = collection(db, "nutritionData"); // Updated collection name
       for (const row of csvData) {
-        // Destructure and map the NAT dataset fields
-        const { Respondents, Age, sex, Ethnic, academic_performance, academic_description, IQ, type_school, socio_economic_status, Study_Habit, NAT_Results } = row;
+        const {
+          Country,
+          "Income Classification": IncomeClassification,
+          "Severe Wasting": SevereWasting,
+          Wasting,
+          Overweight,
+          Stunting,
+          Underweight,
+          "U5 Population ('000s)": U5Population,
+        } = row;
 
-        // IQ is treated as a description (text/string) instead of a number
-        await addDoc(natCollection, {
-          respondents: Respondents,
-          age: Number(Age),
-          sex: sex,
-          ethnic: Ethnic,
-          academic_performance: academic_performance,
-          academic_description: academic_description,
-          iq: IQ,  // Treat IQ as a description
-          type_of_school: type_school,
-          socio_economic_status: socio_economic_status,
-          study_habit: Study_Habit,
-          nat_results: Number(NAT_Results)
+        await addDoc(nutritionCollection, {
+          country: Country,
+          income_classification: Number(IncomeClassification),
+          severe_wasting: Number(SevereWasting) || 0,
+          wasting: Number(Wasting) || 0,
+          overweight: Number(Overweight) || 0,
+          stunting: Number(Stunting) || 0,
+          underweight: Number(Underweight) || 0,
+          u5_population: Number(U5Population) || 0,
         });
       }
       alert("Data saved successfully!");
@@ -69,7 +73,7 @@ const CsvUpload = () => {
         accept=".csv"
         onChange={handleFileUpload}
         ref={fileInputRef}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
       />
       <button onClick={() => fileInputRef.current.click()} className="custom-file-upload">
         Choose File

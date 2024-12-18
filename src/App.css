@@ -411,3 +411,12 @@ tr:nth-child(even) {
 }
 
 /* End of Delete Confirmation Modal */
+
+.icon-hover {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.icon-hover:hover {
+  transform: scale(1.2); /* Slight scaling effect */
+  color: #ffd700; /* Change icon color to gold (or any color of your choice) */
+}
